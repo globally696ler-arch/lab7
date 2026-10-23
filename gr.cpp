@@ -1,42 +1,60 @@
 #include <cctype>
 #include <iostream>
 #include <string>
-#include <vector>
 
 int main() {
-  // Исходный текст
-  std::string text = "В 2023 году студент сдал 3 экзамена и получил 45 баллов, "
-                     "а также 12 бонусов.";
+  // Исходный текст с целыми, дробными и отрицательными числами
+  std::string text = "В 2023 году температура упала до -5 градусов, а затем "
+                     "поднялась до 3.5. Прибыль -100.25 рублей.";
 
   std::cout << "Исходный текст: " << text << "\n\n";
   std::cout << "Найденные числа: ";
 
-  long long sum = 0;       // Сумма всех чисел
-  std::string numStr = ""; // Буфер для текущего числа
-  bool hasNumbers = false; // Флаг: найдено ли хоть одно число
+  double sum = 0.0;        // Используем double для дробных чисел
+  std::string numStr = ""; // Буфер текущего числа
+  bool hasNumbers = false;
 
-  // Проходим по каждому символу
   for (size_t i = 0; i < text.length(); ++i) {
     char c = text[i];
 
+    // 1. Если это цифра — добавляем в буфер
     if (std::isdigit(static_cast<unsigned char>(c))) {
-      numStr += c; // Накапливаем цифры
-    } else {
-      // Если встретили не цифру, но буфер не пуст — значит число закончилось
+      numStr += c;
+    }
+    // 2. Если это точка И после неё идет цифра (дробная часть)
+    else if (c == '.' && i + 1 < text.length() &&
+             std::isdigit(static_cast<unsigned char>(text[i + 1]))) {
+      numStr += c;
+    }
+    // 3. Если это минус И следующий символ — цифра (начало отрицательного
+    // числа)
+    else if (c == '-' && i + 1 < text.length() &&
+             std::isdigit(static_cast<unsigned char>(text[i + 1]))) {
+      // Если в буфере уже есть число, сохраняем его перед началом нового
       if (!numStr.empty()) {
-        long long number = std::stoll(numStr); // Преобразуем в число
-        std::cout << number << " ";            // Выводим найденное число
-        sum += number;                         // Добавляем к сумме
-        numStr.clear();                        // Очищаем буфер
+        double number = std::stod(numStr);
+        std::cout << number << " ";
+        sum += number;
+        numStr.clear();
+        hasNumbers = true;
+      }
+      numStr += c; // Начинаем новое число с минуса
+    }
+    // 4. Любой другой символ (пробел, буква, запятая) — завершаем число
+    else {
+      if (!numStr.empty()) {
+        double number = std::stod(numStr);
+        std::cout << number << " ";
+        sum += number;
+        numStr.clear();
         hasNumbers = true;
       }
     }
   }
 
-  // Проверка: если текст заканчивается цифрой, последнее число не было
-  // обработано
+  // Обработка последнего числа в строке (если текст заканчивается цифрой)
   if (!numStr.empty()) {
-    long long number = std::stoll(numStr);
+    double number = std::stod(numStr);
     std::cout << number << " ";
     sum += number;
     hasNumbers = true;
@@ -44,7 +62,6 @@ int main() {
 
   std::cout << "\n\n";
 
-  // Проверка: были ли вообще числа в тексте
   if (hasNumbers) {
     std::cout << "Сумма всех чисел: " << sum << "\n";
   } else {
