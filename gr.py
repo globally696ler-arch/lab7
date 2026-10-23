@@ -4,7 +4,7 @@ import re
 def extract_and_sum(text: str):
     # Извлекает числа и возвращает их список и сумму.
     # Регулярное выражение для поиска чисел (последовательности цифр)
-    numbers = re.findall(r"\d+", text)
+    numbers = re.findall(r"-?\d+", text)
     # Проверка: найдены ли числа
     if not numbers:
         return [], 0
@@ -13,7 +13,7 @@ def extract_and_sum(text: str):
     return int_numbers, sum(int_numbers)
 
 
-text = "В 2023 году студент сдал 3 экзамена и получил 45 баллов, а также 12 бонусов."
+text = "В 2023 году студент сдал -3 экзамена и получил 45 баллов, а также 12 бонусов."
 print(f"Исходный текст: {text}\n")
 numbers, total = extract_and_sum(text)
 # Проверки и вывод
